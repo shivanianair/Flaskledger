@@ -1,0 +1,334 @@
+{% extends "layout.html" %} {% block title %} Log In {% endblock %} {% block main %}
+<div class="jumbotron jumbotron-fluid" style="background: rgba(0,0,0,0.5);color:aliceblue">
+    <div class="container">
+        <h1 class="display-4">Monthly Bills and Charges</h1>
+        <p class="lead">Bills that one neeeds to pay before deadlines Regularly are shown here</p>
+    </div>
+</div>
+
+<div class="card-group">
+    <div class="card text-white bg-dark mb-3" style="max-width: 18rem; margin: 10px;">
+        <div class="card-header">Wallet</div>
+        <div class="card-body">
+            <i class="fas fa-wallet" style="font-size: xx-large;"></i>
+            <span><h5 class="card-title">{{cash}}</h5></span>
+        </div>
+    </div>
+
+
+
+    <div class="card text-white bg-success mb-3" style="max-width: 18rem; margin: 10px;">
+        <div class="card-header">This Month</div>
+        <div class="card-body">
+            <i class="far fa-address-book" style="font-size: xx-large;"></i>
+            <span><h5 class="card-title">{{grand_etotal}}</h5></span>
+        </div>
+    </div>
+
+    <div class="card  bg-warning mb-3" style="max-width: 18rem; margin: 10px;">
+        <div class="card-header">Money in Stock</div>
+        <div class="card-body">
+            <i class="fas fa-briefcase" style="font-size: xx-large;"></i>
+            <span><h5 class="card-title">{{stockmoney}}</h5></span>
+        </div>
+    </div>
+
+    <script>
+        startTime();
+
+        var dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+
+        var newDate = new Date();
+
+        var DateString = '';
+        for (var i = 0; i < 7; i++) {
+            if (i == newDate.getDay()) {
+                DateString += "<span class='clock__date--curr'>" + dayNames[i] + "</span> ";
+            } else {
+                DateString += "<span>" + dayNames[i] + "</span> ";
+            }
+        }
+        $('.clock__date').html(DateString);
+
+        function startTime() {
+            var today = new Date();
+            var h = checkTime(today.getHours());
+            var m = checkTime(today.getMinutes());
+            var s = checkTime(today.getSeconds());
+
+            var TimeString = h + ':' + m + ':' + s;
+            TimeString = '<span>' + TimeString.split('').join('</span><span>') + '</span>';
+            $('.clock__time').html(TimeString);
+
+            var t = setTimeout(function() {
+                startTime()
+            }, 1000);
+        }
+
+        function checkTime(i) {
+            if (i < 10) {
+                i = '0' + i
+            };
+            return i;
+        }
+
+        $('.clock-toogle').click(function() {
+            $('body').toggleClass('dark');
+        });
+    </script>
+
+    <div class="card text-white bg-primary mb-3" style="max-width: 18rem; margin: 10px;">
+        <div class="card-header">This Year till now</div>
+        <div class="card-body">
+            <i class="far fa-calendar-alt" style="font-size: xx-large;"></i>
+            <span><h5 class="card-title">{{hpgrand_ptotal}}</h5></span>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="card-group container">
+    <div class="card wrapper" style="max-width: 40rem; ">
+        <div class="card-body">
+            <div class="clock-wrap container">
+                <div class="clock">
+                    <div class="clock__date">
+                    </div>
+                    <div class="clock__time ">
+                    </div>
+                </div>
+                <h3 class="display-4">Time is Valuable!</h1>
+            </div>
+        </div>
+    </div>
+
+
+
+    <form action="/education" method="post" class="card text-white bg-secondary text-center container card-body" style="max-width: 80vw">
+        <div class="card-header">Add Purchase!</div>
+        <div class="form-group container">
+            <input autocomplete="off" autofocus class="form-control" name="epurpose" placeholder="commodity" type="text">
+        </div>
+        <div class="form-group container">
+            <input class="form-control" name="period" placeholder="period" type="number">
+        </div>
+        <div class="form-group container">
+            <input class="form-control" name="amount" placeholder="amount" type="number">
+            <div class="form-group container ">
+                <label for="inputState"></label>
+                <select id="inputState" class="form-control container" name="category">
+        <option selected>Choose Category</option>
+        <option id="dropUtilities" value="Utilities" >Utilities</option>
+        <option id="dropTaxes" value="Taxes" >Taxes</option>
+        <option id="dropLoans&EMI" value="Loans & EMI" >Loans & EMI</option>
+        <option id="dropChits&Insurance" value="Chits & Insurance" >Chits & Insurance</option>
+        <option id="dropOthers" value="Others">Others</option>
+      </select>
+            </div>
+            <button class="btn btn-primary container" type="pspend">Add and Spend!</button>
+    </form>
+    </div>
+</div>
+
+<h1 class="display-1">This Month</h1>
+<main class="container-fluid">
+    <table class="table table-striped  table-hover table-primay">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Bill</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Period(Months)</th>
+                <th scope="col">DatePaid</th>
+                <th scope="col">Nextduedate</th>
+                <th scope="col">Category</th>
+                <th scope="col">Actions</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for espending in espendings: %}
+            <tr>
+                <td>{{espending["epurpose"]}}</td>
+                <td>{{espending["amount"]}}</td>
+                <td>{{espending["period"]}}</td>
+                <td>{{espending["datestamp"]}}</td>
+                <td>{{espending["duedate"]}}</td>
+                <td>{{espending["category"]}}</td>
+                <td>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="{{espending['epurpose']}}" data-link="/education/edit/{{espending['eid']}}" data-amount="{{espending['amount']}}" data-period="{{espending['period']}}"
+                        data-datestamp="{{espending['datestamp']}}" data-status="{{espending['status']}}" data-category="{{espending['category']}}">Edit</button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2" data-whatever="{{espending['epurpose']}}" data-link="/education/pay/{{espending['eid']}}" data-amount="{{espending['amount']}}" data-period="{{espending['period']}}"
+                        data-datestamp="{{today}}" data-status="{{espending['status']}}">Pay</button>
+                </td>
+            </tr>
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Update</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                        </div>
+                        <div class="modal-body">
+                            <form class="formaction" method="POST">
+                                <div class="form-group">
+                                    <label for="recipient-name" class="col-form-label">epurpose:</label>
+                                    <input type="text" class="form-control modalpurpose" name="update_epurpose" id="recipient-name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-text" class="col-form-label">amount:</label>
+                                    <input class="form-control modalamount" type="number" name="update_amount" id="message-text"></input>
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-text" class="col-form-label">period:</label>
+                                    <input class="form-control modalperiod" type="number" name="update_period" id="message-text"></input>
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-text" class="col-form-label">date:</label>
+                                    <input class="form-control modaldatestamp" type="date" name="update_datestamp" id="message-text"></input>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputState">Category</label>
+                                    <select id="inputState" class="form-control editcategory" name="update_category">
+                          <option selected>Choose Category</option>
+                          <option id="dropUtilities" value="Utilities" >Utilities</option>
+                          <option id="dropTaxes" value="Taxes" >Taxes</option>
+                          <option id="dropLoans&EMI" value="Loans & EMI" >Loans & EMI</option>
+                          <option id="dropChits&Insurance" value="Chits & Insurance" >Chits & Insurance</option>
+                          <option id="dropOthers" value="Others">Others</option>
+                        </select>
+                                </div>
+                                <div class="custom-control custom-checkbox mb-3 alert alert-danger">
+                                    <input type="checkbox" class="custom-control-input" name="updatestatus" id="customControlValidation1" value=0>
+                                    <label class="custom-control-label btn btn-danger" for="customControlValidation1">Deactivate</label>
+                                    <div>This is a Dangerous Step by deactivating you will no longer recive remeinders about this education policy</div>
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary ">Update</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- ++++++++++++++++++++++++++++++++++++++++++++pay+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+            <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Update</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                        </div>
+                        <div class="modal-body alert alert-dark" role="alert">
+                            <form class="formaction" method="POST">
+                                <div class="form-group alert alert-primary" role="alert">
+                                    <label for="recipient-name" class="col-form-label">Name:</label>
+                                    <h6 type="text" class="modalpurpose"></h6>
+                                </div>
+                                <div class="form-group alert alert-warning" role="alert">
+                                    <label for="message-text" class="col-form-label">period:</label>
+                                    <h6 class="modalperiod" type="number"></h6>
+                                </div>
+                                <div class="form-group alert alert-warning" role="alert">
+                                    <label for="message-text" class="col-form-label">date:</label>
+                                    <input class="form-control modaldatestamp" type="date" name="pay_datestamp" id="message-text"></input>
+                                </div>
+                                <div class="form-group">
+                                    <label for="message-text" class="col-form-label">amount:</label>
+                                    <input class="form-control modalamount" type="number" name="pay_amount" id="message-text"></input>
+                                </div>
+                                <div class="custom-control mb-3 alert alert-danger">
+                                    <div class="custom-control custom-checkbox ">
+                                        <input type="checkbox" class="custom-control-input" id="customCheck1" value="0" name="pay_status">
+                                        <label class="custom-control-label btn btn-danger" for="customCheck1">DEACTIVATE</label>
+                                        <div>This is a Dangerous Step by deactivating you will no longer recive remeinders about this education policy</div>
+                                    </div>
+                                </div>
+                        </div>
+
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary ">Update</button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- ++++++++++++++++++++++++++++++++++++++++++++pay+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++= -->
+            {% endfor %}
+
+    </table>
+
+
+    <h1 class="display-1 " style="border-style: none">Payment History till date</h1>
+    <table class="table table-striped  table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Bill</th>
+                <th scope="col">Amount</th>
+                <th scope="col">DatePaid</th>
+                <th scope="col">Category</th>
+            </tr>
+        </thead>
+        {% for hpspending in hpspendings: %}
+        <tr>
+            <td>{{hpspending["paymentpurpose"]}}</td>
+            <td>{{hpspending["amount"]}}</td>
+            <td>{{hpspending["datestamp"]}}</td>
+            <td>{{hpspending["category"]}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        $('#exampleModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget) // Button that triggered the modal
+            var recipient = button.data('whatever')
+            var amount = button.data('amount')
+            var datestamp = button.data('datestamp')
+            var period = button.data('period')
+            var link = button.data('link')
+            var category = button.data('category')
+                // Extract info from data-* attributes
+                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            var modal = $(this)
+            modal.find('.modal-title').text('New message to ' + recipient)
+            modal.find('.modalpurpose').val(recipient)
+            modal.find('.modalamount').val(amount)
+            modal.find('.modaldatestamp').val(datestamp)
+            modal.find('.modalperiod').val(period)
+            modal.find('.formaction').attr("action", link)
+            modal.find('.editcategory').val(category)
+        })
+    </script>
+
+    <script>
+        $('#exampleModal2').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget) // Button that triggered the modal
+            var recipient = button.data('whatever')
+            var amount = button.data('amount')
+            var datestamp = button.data('datestamp')
+            var period = button.data('period')
+            var link = button.data('link')
+                // Extract info from data-* attributes
+                // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+                // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+            var modal = $(this)
+            modal.find('.modal-title').text('Edit :' + recipient)
+            modal.find('.modalpurpose').text(recipient)
+            modal.find('.modalamount').val(amount)
+            modal.find('.modaldatestamp').val(datestamp)
+            modal.find('.modalperiod').text(period)
+            modal.find('.formaction').attr("action", link)
+
+        })
+    </script>
+</main>
+{% endblock %}
